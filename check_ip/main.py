@@ -2,9 +2,8 @@ import json
 import requests
 import os
 import ipaddress
-import dotenv
-
-dotenv.load_dotenv()
+# import dotenv
+# dotenv.load_dotenv()
 
 def is_valid_ip(ip):
     try:
