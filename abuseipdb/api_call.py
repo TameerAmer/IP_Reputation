@@ -25,7 +25,7 @@ def calculate_risk_level(abuse_confidence_score):
 def status_code_message(data):
     if data.get("error") == "invalid_ip":
         return 1, "failed"
-    if data.get("error") == "api_failed":
+    if data.get("error") in ["api_failed", "missing_api_key"]:
         return 2, "failed"
     return 0, "success"
 
