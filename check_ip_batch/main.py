@@ -2,8 +2,8 @@ import os
 import json
 from abuseipdb.api_call import make_ip_check_request, calculate_risk_level, status_code_message
 
-def seperate_ip_addresses():
-    """Seperate IP addresses from environment variable and print them as a list."""
+def separate_ip_addresses():
+    """Separate IP addresses from environment variable and print them as a list."""
     raw = os.getenv("IP_ADDRESSES")
     if not raw:
         return []
@@ -20,8 +20,7 @@ def make_requests(ip_addresses):
     """Make API requests for a list of IP addresses and return their results."""
     results = {}
     for ip in ip_addresses:
-        os.environ["IP_ADDRESS"] = ip
-        result = make_ip_check_request()
+        result = make_ip_check_request(ip)
         results[ip] = result
     return results
 
@@ -79,7 +78,7 @@ def results_summary(results):
     results_summary={}
     for ip in results:
         res={}
-        if results[ip].get("error") is None:
+        if "error" not in results[ip]:
             abuse_confidence_score=int(results[ip]['abuseConfidenceScore'])
             res["risk_level"]=calculate_risk_level(abuse_confidence_score)
             res["abuse_confidence_score"]=abuse_confidence_score
@@ -93,29 +92,29 @@ def error_summary(results):
     errors={}
     for ip in results:
         if results[ip].get("error") is not None:
-            errors[results[ip]["error"]]=results[ip]["message"]
+            errors[results[ip]["error"]] = results[ip].get("message")
     return errors
 
 def final_summary(results):
     res={}
     step_status={}
-    summary={}
+    api_object={}
     code,message=batch_status_code_message(results)
     step_status["code"]=code
     step_status["message"]=message
-    summary["summary"]=api_object_summary(results)
-
+    api_object["summary"]=api_object_summary(results)
+    api_object["results"]=results_summary(results)
+    
     res["step_status"]= step_status
-    res["api_object"]= summary
-    res["results"]= results_summary(results)
     errors=error_summary(results)
     if errors:
-        res["errors"]=errors
+        api_object["errors"]=errors
+    res["api_object"]=api_object
     return res
 
 
 if __name__ == "__main__":
-    ip_addresses = seperate_ip_addresses()
+    ip_addresses = separate_ip_addresses()
     results = make_requests(ip_addresses)
     summary = final_summary(results)
     response=json.dumps(summary, indent=4)  

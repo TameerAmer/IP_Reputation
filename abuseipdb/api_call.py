@@ -29,12 +29,11 @@ def status_code_message(data):
         return 2, "failed"
     return 0, "success"
 
-def make_ip_check_request():
+def make_ip_check_request(ip_address):
     """
     Fetches IP reputation data from AbuseIPDB using environment variables.
     Returns the 'data' payload from the API or an error dictionary.
     """
-    ip_address = os.getenv('IP_ADDRESS')
     if not is_valid_ip(ip_address):
         return {"error": "invalid_ip","message":"Invalid IP address format"}
     

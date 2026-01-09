@@ -1,4 +1,5 @@
 import json
+import os
 from abuseipdb.api_call import make_ip_check_request, calculate_risk_level, status_code_message
 
 def build_result(data):
@@ -36,7 +37,8 @@ def build_result(data):
 
         
 if __name__ == "__main__":
-    response_data = make_ip_check_request()
+    ip_address = os.getenv("IP_ADDRESS")
+    response_data = make_ip_check_request(ip_address)
     result = build_result(response_data)
     response=json.dumps(result, indent=4)
     print(response)
