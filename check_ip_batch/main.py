@@ -3,7 +3,7 @@ import json
 from abuseipdb.api_call import make_ip_check_request, calculate_risk_level, status_code_message
 
 def separate_ip_addresses():
-    """Separate IP addresses from environment variable and print them as a list."""
+    """Separate IP addresses from environment variable and returns them as a list."""
     raw = os.getenv("IP_ADDRESSES")
     if not raw:
         return []
@@ -25,6 +25,12 @@ def make_requests(ip_addresses):
     return results
 
 def api_object_summary(results):
+    """
+    Generate summary statistics for API request results.
+    
+    Returns a dictionary containing total count, successful requests, failed requests,
+    and risk level distribution (HIGH, MEDIUM, LOW).
+    """
     total=len(results)
     success=0
     risk_counts={"HIGH":0,"MEDIUM":0,"LOW":0}
@@ -75,6 +81,12 @@ def batch_status_code_message(results):
     return 2, "failed"  # all valid API requests failed
 
 def results_summary(results):
+    """
+    Extract key information from successful API results.
+    
+    Returns a dictionary mapping IPs to their risk level, abuse confidence score,
+    total reports, country code, and ISP information.
+    """
     results_summary={}
     for ip in results:
         res={}
@@ -89,6 +101,11 @@ def results_summary(results):
     return results_summary
 
 def error_summary(results):
+    """
+    Extract error information from failed API results.
+    
+    Returns a dictionary mapping error types to their corresponding messages.
+    """
     errors={}
     for ip in results:
         if results[ip].get("error") is not None:
@@ -96,6 +113,12 @@ def error_summary(results):
     return errors
 
 def final_summary(results):
+    """
+    Combine all result components into a final comprehensive summary.
+    
+    Returns a dictionary containing step status, API object summary, individual results,
+    and errors (if any).
+    """
     res={}
     step_status={}
     api_object={}
