@@ -35,3 +35,4 @@ jobs:
       run: |
         python -m unittest abuseipdb/tests/test_api_call.py 
         python -m unittest check_ip/tests/test_main.py
+        python -m unittest check_ip_batch/tests/test_main.py

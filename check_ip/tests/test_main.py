@@ -1,32 +1,7 @@
 import unittest
 import os
 from unittest.mock import patch
-from check_ip.main import calculate_risk_level, build_result
-
-
-class TestCalculateRiskLevel(unittest.TestCase):
-    """Test cases for calculate_risk_level function"""
-    
-    def test_high_risk_level(self):
-        """Test HIGH risk classification"""
-        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
-            self.assertEqual(calculate_risk_level(100), "HIGH")
-            self.assertEqual(calculate_risk_level(75), "HIGH")
-            self.assertEqual(calculate_risk_level(70), "HIGH")
-    
-    def test_medium_risk_level(self):
-        """Test MEDIUM risk classification"""
-        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
-            self.assertEqual(calculate_risk_level(50), "MEDIUM")
-            self.assertEqual(calculate_risk_level(25), "MEDIUM")
-            self.assertEqual(calculate_risk_level(69), "MEDIUM")
-    
-    def test_low_risk_level(self):
-        """Test LOW risk classification"""
-        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
-            self.assertEqual(calculate_risk_level(0), "LOW")
-            self.assertEqual(calculate_risk_level(10), "LOW")
-            self.assertEqual(calculate_risk_level(24), "LOW")
+from check_ip.main import build_result
 
 
 class TestBuildResult(unittest.TestCase):
