@@ -26,14 +26,19 @@ class TestMainFunctions(unittest.TestCase):
         result = separate_ip_addresses()
         self.assertEqual(result, [])
 
+    @patch('check_ip_batch.main.time.sleep')
     @patch('check_ip_batch.main.make_ip_check_request')
-    def test_make_requests(self, mock_make_request):
+    def test_make_requests(self, mock_make_request, mock_sleep):
         """
         Verify request dispatch maps IP -> result using a mocked API call.
+        Rate limiting (time.sleep) is mocked to keep tests fast.
         """
         mock_make_request.return_value = {'abuseConfidenceScore': 50}
-        result = make_requests(['192.168.1.1'])
+        result = make_requests(['192.168.1.1', '10.0.0.1'])
         self.assertEqual(result['192.168.1.1']['abuseConfidenceScore'], 50)
+        self.assertEqual(result['10.0.0.1']['abuseConfidenceScore'], 50)
+        # Verify sleep was called once between 2 requests (rate limiting)
+        self.assertEqual(mock_sleep.call_count, 1)
 
     @patch('check_ip_batch.main.calculate_risk_level')
     def test_api_object_summary(self, mock_risk_level):

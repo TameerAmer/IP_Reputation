@@ -38,6 +38,8 @@ def make_ip_check_request(ip_address):
         return {"error": "invalid_ip","message":"Invalid IP address format"}
     
     api_key = os.getenv('ABUSEIPDB_API_KEY')
+    if not api_key:
+        return {"error": "missing_api_key", "message": "ABUSEIPDB_API_KEY not set"}
     url = 'https://api.abuseipdb.com/api/v2/check'
     querystring = {
             'ipAddress': ip_address,

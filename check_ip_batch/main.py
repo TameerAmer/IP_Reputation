@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from abuseipdb.api_call import make_ip_check_request, calculate_risk_level, status_code_message
 
 def separate_ip_addresses():
@@ -19,7 +20,9 @@ def separate_ip_addresses():
 def make_requests(ip_addresses):
     """Make API requests for a list of IP addresses and return their results."""
     results = {}
-    for ip in ip_addresses:
+    for i, ip in enumerate(ip_addresses):
+        if i > 0:
+            time.sleep(1)  # Rate limiting
         result = make_ip_check_request(ip)
         results[ip] = result
     return results
