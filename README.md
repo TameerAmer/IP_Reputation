@@ -370,10 +370,6 @@ If you encounter any issues:
 
 ---
 
-## License
-
-See LICENSE file for details.
-
 ## Credits
 
 - Uses the [AbuseIPDB API](https://www.abuseipdb.com/)
