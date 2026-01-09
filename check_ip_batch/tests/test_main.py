@@ -98,7 +98,7 @@ class TestMainFunctions(unittest.TestCase):
             '10.0.0.1': {'error': 'invalid_ip', 'message': 'Invalid IP address'}
         }
         errors = error_summary(results)
-        self.assertEqual(errors['invalid_ip'], 'Invalid IP address')
+        self.assertEqual(errors['10.0.0.1'], 'Invalid IP address')
 
     @patch('check_ip_batch.main.calculate_risk_level')
     @patch('check_ip_batch.main.status_code_message')
