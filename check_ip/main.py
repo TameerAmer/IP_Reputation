@@ -1,45 +1,12 @@
 import json
-import requests
 import os
-import ipaddress
-# import dotenv
-# dotenv.load_dotenv()
 
-def is_valid_ip(ip):
-    try:
-        ipaddress.ip_address(ip)
-        return True
-    except ValueError:
-        return False
-
-def make_ip_check_request():
-    ip_address = os.getenv('IP_ADDRESS')
-    if not is_valid_ip(ip_address):
-        return {"error": "invalid_ip"}
-    
-    api_key = os.getenv('ABUSEIPDB_API_KEY')
-    url = 'https://api.abuseipdb.com/api/v2/check'
-    querystring = {
-            'ipAddress': ip_address,
-            'maxAgeInDays': '90'   
-        }
-    
-    headers = {
-        'Accept': 'application/json',
-        'Key': api_key
-    }
-
-    try:
-        response = requests.request(method='GET', url=url, headers=headers, params=querystring, timeout=10)
-        response.raise_for_status()
-    except requests.exceptions.RequestException:
-        return {"error": "api_failed"}
-
-    data=response.json()
-    return data['data']
-
+from abuseipdb.api_call import make_ip_check_request
 
 def calculate_risk_level(abuse_confidence_score):
+    """
+    Categorizes risk level (HIGH/MEDIUM/LOW) based on abuse confidence score.
+    """
     confidence=int(os.getenv('CONFIDENCE_THRESHOLD', 70))
     if abuse_confidence_score >= confidence:
         return "HIGH"
@@ -48,6 +15,10 @@ def calculate_risk_level(abuse_confidence_score):
     return "LOW"
 
 def build_result(data):
+    """
+    Structures API response into standardized format with status codes.
+    Error codes: 0=success, 1=invalid IP, 2=API failed.
+    """
     code=0
     message="success"
     if data.get("error")=="invalid_ip":
