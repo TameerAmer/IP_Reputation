@@ -299,8 +299,12 @@ docker run -e ABUSEIPDB_API_KEY="your-api-key" -e IP_ADDRESSES="118.25.6.39, 8.8
 
 ### "No module named 'requests'" error
 
-- **Problem**: Required packages are not installed
-- **Solution**: Make sure your virtual environment is activated and run `pip install -r requirements.txt`
+- **Problem**: Required packages are not installed or virtual environment is not activated
+- **Solution**: 
+  1. **First**, activate your virtual environment (if you haven't already):
+     - **Windows**: `.venv\Scripts\activate`
+     - **macOS/Linux**: `source .venv/bin/activate`
+  2. **Then**, install the required packages: `pip install -r requirements.txt`
 
 ### "Invalid API key" error
 
