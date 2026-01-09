@@ -1,0 +1,37 @@
+name: run tests
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test against'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install app dependencies 
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        python -m unittest abuseipdb/tests/test_api_call.py 
+        python -m unittest check_ip/tests/test_main.py
