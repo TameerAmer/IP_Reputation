@@ -71,16 +71,16 @@ class TestMakeIpCheckRequest(unittest.TestCase):
     
     def test_invalid_ip_from_env(self):
         """Test that invalid IP from environment returns error"""
-        with patch.dict(os.environ, {'IP_ADDRESS': 'invalid_ip', 'ABUSEIPDB_API_KEY': 'test_key'}):
-            result = make_ip_check_request()
-            self.assertEqual(result, {"error": "invalid_ip"})
+        with patch.dict(os.environ, {'ABUSEIPDB_API_KEY': 'test_key'}):
+            result = make_ip_check_request('invalid_ip')
+            self.assertEqual(result.get('error'), "invalid_ip")
     
     def test_missing_ip_env_variable(self):
         """Test that missing IP_ADDRESS returns error"""
         with patch.dict(os.environ, {'ABUSEIPDB_API_KEY': 'test_key'}, clear=False):
             os.environ.pop('IP_ADDRESS', None)
-            result = make_ip_check_request()
-            self.assertEqual(result, {"error": "invalid_ip"})
+            result = make_ip_check_request('')
+            self.assertEqual(result.get('error'), "invalid_ip")
     
     @patch('abuseipdb.api_call.requests.get')
     def test_successful_api_response(self, mock_get):
@@ -99,8 +99,8 @@ class TestMakeIpCheckRequest(unittest.TestCase):
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
         
-        with patch.dict(os.environ, {'IP_ADDRESS': '118.25.6.39', 'ABUSEIPDB_API_KEY': 'test_key'}):
-            result = make_ip_check_request()
+        with patch.dict(os.environ, {'ABUSEIPDB_API_KEY': 'test_key'}):
+            result = make_ip_check_request('118.25.6.39')
             
             self.assertEqual(result['ipAddress'], '118.25.6.39')
             self.assertEqual(result['abuseConfidenceScore'], 50)
@@ -119,18 +119,20 @@ class TestMakeIpCheckRequest(unittest.TestCase):
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
         
-        with patch.dict(os.environ, {'IP_ADDRESS': '8.8.8.8', 'ABUSEIPDB_API_KEY': 'test_key'}):
-            result = make_ip_check_request()
-            self.assertEqual(result, {"error": "api_failed"})
+        with patch.dict(os.environ, {'ABUSEIPDB_API_KEY': 'test_key'}):
+            result = make_ip_check_request('8.8.8.8')
+            self.assertEqual(result.get("error"), "api_failed")
+            self.assertEqual(result.get("message"), "API response missing data")
     
     @patch('abuseipdb.api_call.requests.get')
     def test_api_timeout(self, mock_get):
         """Test API timeout handling"""
         mock_get.side_effect = requests.exceptions.Timeout("Request timeout")
         
-        with patch.dict(os.environ, {'IP_ADDRESS': '8.8.8.8', 'ABUSEIPDB_API_KEY': 'test_key'}):
-            result = make_ip_check_request()
-            self.assertEqual(result, {"error": "api_failed"})
+        with patch.dict(os.environ, {'ABUSEIPDB_API_KEY': 'test_key'}):
+            result = make_ip_check_request('8.8.8.8')
+            self.assertEqual(result.get("error"), "api_failed")
+            self.assertEqual(result.get("message"), "API request failed")
 
 
 
