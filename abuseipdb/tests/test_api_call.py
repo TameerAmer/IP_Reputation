@@ -2,7 +2,7 @@ import unittest
 import os
 from unittest.mock import patch, MagicMock
 import requests
-from abuseipdb.api_call import is_valid_ip, make_ip_check_request
+from abuseipdb.api_call import is_valid_ip, make_ip_check_request, calculate_risk_level, status_code_message
 
 
 class TestIsValidIp(unittest.TestCase):
@@ -26,6 +26,44 @@ class TestIsValidIp(unittest.TestCase):
     def test_none_input(self):
         """Test handling of None input"""
         self.assertFalse(is_valid_ip(None))
+
+class TestCalculateRiskLevel(unittest.TestCase):
+    """Test cases for calculate_risk_level function"""
+    
+    def test_high_risk_level(self):
+        """Test HIGH risk classification"""
+        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
+            self.assertEqual(calculate_risk_level(100), "HIGH")
+            self.assertEqual(calculate_risk_level(75), "HIGH")
+            self.assertEqual(calculate_risk_level(70), "HIGH")
+    
+    def test_medium_risk_level(self):
+        """Test MEDIUM risk classification"""
+        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
+            self.assertEqual(calculate_risk_level(50), "MEDIUM")
+            self.assertEqual(calculate_risk_level(25), "MEDIUM")
+            self.assertEqual(calculate_risk_level(69), "MEDIUM")
+    
+    def test_low_risk_level(self):
+        """Test LOW risk classification"""
+        with patch.dict(os.environ, {'CONFIDENCE_THRESHOLD': '70'}):
+            self.assertEqual(calculate_risk_level(0), "LOW")
+            self.assertEqual(calculate_risk_level(10), "LOW")
+            self.assertEqual(calculate_risk_level(24), "LOW")
+            
+
+class TestStatusCodeMessage(unittest.TestCase):
+    """Test cases for status_code_message function"""
+
+    def test_success_no_error_key(self):
+        self.assertEqual(status_code_message({"ipAddress": "1.1.1.1"}), (0, "success"))
+
+    def test_invalid_ip_error(self):
+        self.assertEqual(status_code_message({"error": "invalid_ip"}), (1, "failed"))
+
+    def test_api_failed_error(self):
+        self.assertEqual(status_code_message({"error": "api_failed"}), (2, "failed"))
+
 
 
 class TestMakeIpCheckRequest(unittest.TestCase):
