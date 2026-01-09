@@ -112,7 +112,7 @@ def error_summary(results):
     errors={}
     for ip in results:
         if results[ip].get("error") is not None:
-            errors[results[ip]["error"]] = results[ip].get("message")
+            errors[ip] = results[ip].get("message")
     return errors
 
 def final_summary(results):
