@@ -22,7 +22,7 @@ def make_requests(ip_addresses):
     results = {}
     for i, ip in enumerate(ip_addresses):
         if i > 0:
-            time.sleep(1)  # Rate limiting
+            time.sleep(0.1)  # Rate limiting
         result = make_ip_check_request(ip)
         results[ip] = result
     return results
