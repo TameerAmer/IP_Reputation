@@ -319,13 +319,6 @@ docker run -e ABUSEIPDB_API_KEY="your-api-key" -e IP_ADDRESSES="118.25.6.39, 8.8
 - **Problem**: You might need to use `python3` instead of `python`
 - **Solution**: Replace `python` with `python3` in all commands
 
-### API Rate Limits
-
-The free AbuseIPDB API has limits:
-- 1,000 requests per day
-- 1 request per second
-
-If you exceed these, you'll get an error. Wait a bit before trying again.
 
 ### Tests are failing
 
