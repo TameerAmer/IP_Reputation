@@ -327,6 +327,66 @@ docker run -e ABUSEIPDB_API_KEY="your-api-key" -e IP_ADDRESSES="118.25.6.39, 8.8
 3. Check that you have an internet connection (some tests mock API calls, but imports still need to work)
 
 ---
+## Known Limitations & Performance Considerations
+
+#### API Rate Limits
+
+The free tier of AbuseIPDB has the following limitations:
+
+- **1,000 requests per day** (resets at midnight UTC)
+- **No per-second rate limit** (but we implement a 0.1-second delay to be respectful to the API)
+
+#### Performance with Large Batches
+
+The batch IP checker implements a 0.1-second delay between requests to:
+
+- Avoid overwhelming the API with rapid-fire requests
+- Be a good API citizen (even though there's no enforced limit)
+- Reduce the chance of triggering any undocumented rate limiting
+
+Expected processing times:
+
+| Number of IPs | Estimated Time | API Calls Used | Remaining (Free Tier) |
+|--------------|----------------|----------------|----------------------|
+| 10 IPs       | ~1 second      | 10/1000        | 990                  |
+| 50 IPs       | ~5 seconds     | 50/1000        | 950                  |
+| 100 IPs      | ~10 seconds    | 100/1000       | 900                  |
+| 500 IPs      | ~50 seconds    | 500/1000       | 500                  |
+| 1,000 IPs    | ~1.7 minutes   | 1000/1000      | 0 (limit reached)    |
+
+#### What Happens When You Hit the Daily Limit
+
+When you exceed 1,000 requests in a day, the API will return an error:
+
+- The tool will report status code 2 (API error)
+- Individual IPs that failed will appear in the `errors` object
+- If you're running a batch and hit the limit mid-way, you'll get partial results
+
+Example output when limit is hit:
+
+```json
+{
+  "step_status": {
+    "code": 0,
+    "message": "partial_success"
+  },
+  "api_object": {
+    "summary": {
+      "total": 100,
+      "successful": 47,
+      "failed": 53,
+      "risk_counts": {"HIGH": 5, "MEDIUM": 12, "LOW": 30}
+    },
+    "results": { ... },
+    "errors": {
+      "192.168.1.50": "API request failed",
+      "192.168.1.51": "API request failed",
+      ...
+    }
+  }
+}
+```
+---
 
 ## Project Structure
 
