@@ -10,9 +10,13 @@ A Python application to check the reputation of IP addresses using the [AbuseIPD
 - [Getting Your API Key](#getting-your-api-key)
 - [How to Use](#how-to-use)
 - [Running Tests](#running-tests)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Docker Setup (Optional)](#docker-setup-optional)
 - [Troubleshooting](#troubleshooting)
-
+- [Known Limitations & Performance Considerations](#known-limitations--performance-considerations)
+- [Project Structure](#project-structure)
+- [Support](#support)
+- [Credits](#credits)
 ---
 
 ## What Does This Do?
@@ -260,6 +264,51 @@ python -m unittest check_ip_batch/tests/test_main.py
 ```
 
 If all tests pass, you'll see `OK` at the end. If any fail, you'll see detailed error messages.
+
+---
+## CI/CD Pipeline
+
+This project includes automated testing and Docker image building through GitHub Actions.
+
+### Automated Testing
+
+Every pull request triggers automated tests to ensure code quality:
+
+- Runs all unit tests across the project
+- Uses Python 3.12
+- Must pass all tests before merging to `main`
+
+### Docker Image Building & Publishing (Production)
+
+The workflow includes a commented-out section for building and pushing Docker images to a registry. This is intended for production deployment and requires additional setup.
+
+#### To Enable Image Building:
+
+1. **Choose a Docker Registry**:
+   - [Docker Hub](https://hub.docker.com/) (free tier available)
+   - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) (free)
+   - Or your preferred registry
+
+2. **Create Docker Repositories** (if using Docker Hub):
+    - Create two repositories with these exact names:
+       - `check-ip`
+       - `check-ip-batch`
+    - Keep your Docker Hub username handy for the next step
+
+3. **Set Up Registry Credentials** in your GitHub repository:
+   - Go to Settings → Secrets and variables → Actions
+   - Add your registry credentials:
+       - `DOCKER_USERNAME`: Your Docker Hub username
+       - `DOCKER_PASSWORD`: Your Docker Hub access token (from Account Settings → Security)
+
+4. **Update the Workflow File** (`.github/workflows/auto_tests.yml`):
+   - Uncomment the `build-and-push-images` section
+   - Configure the image registry and repository names
+   - Update the Docker image push commands with your registry details
+
+5. **Images are built only when**:
+   - All tests pass
+   - Workflow is manually triggered or on pull request/push events (depending on configuration)
 
 ---
 
