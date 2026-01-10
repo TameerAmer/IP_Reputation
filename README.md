@@ -10,9 +10,13 @@ A Python application to check the reputation of IP addresses using the [AbuseIPD
 - [Getting Your API Key](#getting-your-api-key)
 - [How to Use](#how-to-use)
 - [Running Tests](#running-tests)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Docker Setup (Optional)](#docker-setup-optional)
 - [Troubleshooting](#troubleshooting)
-
+- [Known Limitations & Performance Considerations](#known-limitations--performance-considerations)
+- [Project Structure](#project-structure)
+- [Support](#support)
+- [Credits](#credits)
 ---
 
 ## What Does This Do?
@@ -262,6 +266,51 @@ python -m unittest check_ip_batch/tests/test_main.py
 If all tests pass, you'll see `OK` at the end. If any fail, you'll see detailed error messages.
 
 ---
+## CI/CD Pipeline
+
+This project includes automated testing and Docker image building through GitHub Actions.
+
+### Automated Testing
+
+Every pull request triggers automated tests to ensure code quality:
+
+- Runs all unit tests across the project
+- Uses Python 3.12
+- Must pass all tests before merging to `main`
+
+### Docker Image Building & Publishing (Production)
+
+The workflow includes a commented-out section for building and pushing Docker images to a registry. This is intended for production deployment and requires additional setup.
+
+#### To Enable Image Building:
+
+1. **Choose a Docker Registry**:
+   - [Docker Hub](https://hub.docker.com/) (free tier available)
+   - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) (free)
+   - Or your preferred registry
+
+2. **Create Docker Repositories** (if using Docker Hub):
+    - Create two repositories with these exact names:
+       - `check-ip`
+       - `check-ip-batch`
+    - Keep your Docker Hub username handy for the next step
+
+3. **Set Up Registry Credentials** in your GitHub repository:
+   - Go to Settings → Secrets and variables → Actions
+   - Add your registry credentials:
+       - `DOCKER_USERNAME`: Your Docker Hub username
+       - `DOCKER_PASSWORD`: Your Docker Hub access token (from Account Settings → Security)
+
+4. **Update the Workflow File** (`.github/workflows/auto_tests.yml`):
+   - Uncomment the `build-and-push-images` section
+   - Configure the image registry and repository names
+   - Update the Docker image push commands with your registry details
+
+5. **Images are built only when**:
+   - All tests pass
+   - Workflow is manually triggered or on pull request/push events (depending on configuration)
+
+---
 
 ## Docker Setup (Optional)
 
@@ -299,8 +348,12 @@ docker run -e ABUSEIPDB_API_KEY="your-api-key" -e IP_ADDRESSES="118.25.6.39, 8.8
 
 ### "No module named 'requests'" error
 
-- **Problem**: Required packages are not installed
-- **Solution**: Make sure your virtual environment is activated and run `pip install -r requirements.txt`
+- **Problem**: Required packages are not installed or virtual environment is not activated
+- **Solution**: 
+  1. **First**, activate your virtual environment (if you haven't already):
+     - **Windows**: `.venv\Scripts\activate`
+     - **macOS/Linux**: `source .venv/bin/activate`
+  2. **Then**, install the required packages: `pip install -r requirements.txt`
 
 ### "Invalid API key" error
 
@@ -315,13 +368,6 @@ docker run -e ABUSEIPDB_API_KEY="your-api-key" -e IP_ADDRESSES="118.25.6.39, 8.8
 - **Problem**: You might need to use `python3` instead of `python`
 - **Solution**: Replace `python` with `python3` in all commands
 
-### API Rate Limits
-
-The free AbuseIPDB API has limits:
-- 1,000 requests per day
-- 1 request per second
-
-If you exceed these, you'll get an error. Wait a bit before trying again.
 
 ### Tests are failing
 
@@ -329,6 +375,66 @@ If you exceed these, you'll get an error. Wait a bit before trying again.
 2. Ensure all dependencies are installed: `pip install -r requirements.txt`
 3. Check that you have an internet connection (some tests mock API calls, but imports still need to work)
 
+---
+## Known Limitations & Performance Considerations
+
+#### API Rate Limits
+
+The free tier of AbuseIPDB has the following limitations:
+
+- **1,000 requests per day** (resets at midnight UTC)
+- **No per-second rate limit** (but we implement a 0.1-second delay to be respectful to the API)
+
+#### Performance with Large Batches
+
+The batch IP checker implements a 0.1-second delay between requests to:
+
+- Avoid overwhelming the API with rapid-fire requests
+- Be a good API citizen (even though there's no enforced limit)
+- Reduce the chance of triggering any undocumented rate limiting
+
+Expected processing times:
+
+| Number of IPs | Estimated Time | API Calls Used | Remaining (Free Tier) |
+|--------------|----------------|----------------|----------------------|
+| 10 IPs       | ~1 second      | 10/1000        | 990                  |
+| 50 IPs       | ~5 seconds     | 50/1000        | 950                  |
+| 100 IPs      | ~10 seconds    | 100/1000       | 900                  |
+| 500 IPs      | ~50 seconds    | 500/1000       | 500                  |
+| 1,000 IPs    | ~1.7 minutes   | 1000/1000      | 0 (limit reached)    |
+
+#### What Happens When You Hit the Daily Limit
+
+When you exceed 1,000 requests in a day, the API will return an error:
+
+- The tool will report status code 2 (API error)
+- Individual IPs that failed will appear in the `errors` object
+- If you're running a batch and hit the limit mid-way, you'll get partial results
+
+Example output when limit is hit:
+
+```json
+{
+  "step_status": {
+    "code": 0,
+    "message": "partial_success"
+  },
+  "api_object": {
+    "summary": {
+      "total": 100,
+      "successful": 47,
+      "failed": 53,
+      "risk_counts": {"HIGH": 5, "MEDIUM": 12, "LOW": 30}
+    },
+    "results": { ... },
+    "errors": {
+      "192.168.1.50": "API request failed",
+      "192.168.1.51": "API request failed",
+      ...
+    }
+  }
+}
+```
 ---
 
 ## Project Structure
@@ -365,10 +471,6 @@ If you encounter any issues:
    - Your operating system (Windows/macOS/Linux)
 
 ---
-
-## License
-
-See LICENSE file for details.
 
 ## Credits
 

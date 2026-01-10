@@ -37,30 +37,32 @@ jobs:
         python -m unittest check_ip/tests/test_main.py
         python -m unittest check_ip_batch/tests/test_main.py
 
-  
-  build-and-push-images:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get code
-      uses: actions/checkout@v4
+  # Production consideration: Build and push Docker images
+  # Uncomment and configure for production deployment
 
-    - name: Build and push check-ip image
-      id: set-image1-tag
-      run: |
-        TAG="${{ github.sha }}-$(date +%Y%m%d-%H%M%S)"
-        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-        docker build -t check-ip -f check_ip/Dockerfile .
-        docker tag check-ip ${{ secrets.DOCKERHUB_USERNAME }}/check-ip:$TAG
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/check-ip:$TAG
+  # build-and-push-images:
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Get code
+  #     uses: actions/checkout@v4
+
+  #   - name: Build and push check-ip image
+  #     id: set-image1-tag
+  #     run: |
+  #       TAG="${{ github.sha }}-$(date +%Y%m%d-%H%M%S)"
+  #       docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+  #       docker build -t check-ip -f check_ip/Dockerfile .
+  #       docker tag check-ip ${{ secrets.DOCKERHUB_USERNAME }}/check-ip:$TAG
+  #       docker push ${{ secrets.DOCKERHUB_USERNAME }}/check-ip:$TAG
     
-    - name: Build and push check-ip-batch image
-      id: set-image2-tag
-      run: |
-        TAG="${{ github.sha }}-$(date +%Y%m%d-%H%M%S)"
-        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-        docker build -t check-ip-batch -f check_ip_batch/Dockerfile .
-        docker tag check-ip-batch ${{ secrets.DOCKERHUB_USERNAME }}/check-ip-batch:$TAG
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/check-ip-batch:$TAG
+  #   - name: Build and push check-ip-batch image
+  #     id: set-image2-tag
+  #     run: |
+  #       TAG="${{ github.sha }}-$(date +%Y%m%d-%H%M%S)"
+  #       docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+  #       docker build -t check-ip-batch -f check_ip_batch/Dockerfile .
+  #       docker tag check-ip-batch ${{ secrets.DOCKERHUB_USERNAME }}/check-ip-batch:$TAG
+  #       docker push ${{ secrets.DOCKERHUB_USERNAME }}/check-ip-batch:$TAG
 
 
