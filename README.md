@@ -1,4 +1,6 @@
 # IP Reputation Checker
+![Tests](https://github.com/TameerAmer/IP_Reputation/actions/workflows/auto_tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 
 A Python application to check the reputation of IP addresses using the [AbuseIPDB](https://www.abuseipdb.com/) API. This tool helps identify potentially malicious IP addresses by checking their abuse confidence scores and reporting history.
 
