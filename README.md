@@ -107,6 +107,8 @@ This installs all the necessary libraries the application needs.
 
 **Want to test the application immediately?** Use this test API key created specifically for assignment evaluation:
 
+> ✅ **If you're using this Quick Start guide, you can skip ahead to [How to Use](#how-to-use) once you've tested the commands below. ** You only need to follow [Getting Your API Key](#getting-your-api-key) if you want to set up your own account for regular use.
+
 ### Test with Single IP Check
 ```bash
 # Set the test API key
