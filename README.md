@@ -57,7 +57,7 @@ docker run --rm -e ABUSEIPDB_API_KEY="0f638e87fce7988030b6c1b860511a80f5b534498e
 
 > **Note for Reviewers:**  
 > This test account uses the free tier (1,000 requests/day). If you encounter rate limits,  
-> you can create your own account in 5 minutes - see [Getting Your Own API Key](#getting-your-own-api-key).
+> you can create your own account in 5 minutes - see [Getting Your API Key](#getting-your-api-key).
 
 ---
 
