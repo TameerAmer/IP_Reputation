@@ -18,6 +18,48 @@ A Python application to check the reputation of IP addresses using the [AbuseIPD
 - [Support](#support)
 - [Credits](#credits)
 ---
+## 🚀 Quick Start (For Reviewers)
+
+**Want to test the application immediately?** Use this test API key created specifically for assignment evaluation:
+
+### Test with Single IP Check
+```bash
+# Set the test API key
+export ABUSEIPDB_API_KEY="0f638e87fce7988030b6c1b860511a80f5b534498ef9b1ee918bed878ff45de164a45fe64b9c9a56"
+
+# Check a single IP
+export IP_ADDRESS="8.8.8.8"
+python -m check_ip.main
+```
+
+### Test with Batch IP Check
+```bash
+# Set the test API key  
+export ABUSEIPDB_API_KEY="0f638e87fce7988030b6c1b860511a80f5b534498ef9b1ee918bed878ff45de164a45fe64b9c9a56"
+
+# Check multiple IPs
+export IP_ADDRESSES="118.25.6.39,8.8.8.8,1.1.1.1,185.220.101.1"
+python -m check_ip_batch.main
+```
+
+### Docker Quick Test
+```bash
+# Single IP
+docker build -t check-ip -f check_ip/Dockerfile .
+docker run --rm -e ABUSEIPDB_API_KEY="0f638e87fce7988030b6c1b860511a80f5b534498ef9b1ee918bed878ff45de164a45fe64b9c9a56" \
+           -e IP_ADDRESS="8.8.8.8" check-ip
+
+# Batch
+docker build -t check-ip-batch -f check_ip_batch/Dockerfile .
+docker run --rm -e ABUSEIPDB_API_KEY="0f638e87fce7988030b6c1b860511a80f5b534498ef9b1ee918bed878ff45de164a45fe64b9c9a56" \
+           -e IP_ADDRESSES="118.25.6.39,8.8.8.8" check-ip-batch
+```
+
+> **Note for Reviewers:**  
+> This test account uses the free tier (1,000 requests/day). If you encounter rate limits,  
+> you can create your own account in 5 minutes - see [Getting Your Own API Key](#getting-your-own-api-key).
+
+---
 
 ## What Does This Do?
 
